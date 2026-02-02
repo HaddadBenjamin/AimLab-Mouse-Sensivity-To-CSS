@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aim Lab → CS:S Sensitivity Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .language-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .language-selector select {
+            padding: 8px 12px;
+            border: 2px solid #00BCD4;
+            border-radius: 6px;
+            background: white;
+            color: #333;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .language-selector select:hover {
+            background: #00BCD4;
+            color: white;
+        }
+
+        .language-selector select:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.2);
+        }
+
+        h1 {
+            color: #1e3c72;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+            margin-top: 20px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #00BCD4;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1565C0;
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, #00BCD4 0%, #0097A7 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 25px;
+            display: none;
+        }
+
+        .result-box.show {
+            display: block;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-value {
+            font-size: 42px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .result-label {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #00BCD4 0%, #0097A7 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 188, 212, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #999;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="language-selector">
+            <select id="languageSelect" onchange="changeLanguage()">
+                <option value="en">🇬🇧 English</option>
+                <option value="fr">🇫🇷 Français</option>
+                <option value="es">🇪🇸 Español</option>
+                <option value="de">🇩🇪 Deutsch</option>
+                <option value="pt">🇵🇹 Português</option>
+                <option value="ru">🇷🇺 Русский</option>
+                <option value="ja">🇯🇵 日本語</option>
+            </select>
+        </div>
+
+        <h1 data-i18n="title">🎯 Sensitivity Converter</h1>
+        <p class="subtitle" data-i18n="subtitle">Aim Lab → Counter-Strike Source</p>
+
+        <div class="info-box">
+            <span data-i18n="info"></span>
+        </div>
+
+        <div class="input-group">
+            <label for="aimlabSens" data-i18n="label_aimlab_sens"></label>
+            <input type="number" id="aimlabSens" value="1.19141" step="0.00001" min="0.1" max="10">
+        </div>
+
+        <div class="input-group">
+            <label for="aimlabADS" data-i18n="label_zoom_sens"></label>
+            <input type="number" id="aimlabADS" value="0.8189" step="0.00001" min="0.1" max="10">
+        </div>
+
+        <div class="input-group">
+            <label for="dpi" data-i18n="label_dpi"></label>
+            <input type="number" id="dpi" value="1800" min="100" max="20000">
+        </div>
+
+        <button onclick="convertSensitivity()" data-i18n="button_calculate"></button>
+
+        <div id="result" class="result-box">
+            <div class="result-label" data-i18n="result_css_normal"></div>
+            <div class="result-value" id="cssValue">-</div>
+            <div class="result-label">eDPI: <span id="edpi">-</span></div>
+            
+            <hr style="margin: 20px 0; opacity: 0.3;">
+            
+            <div class="result-label" data-i18n="result_css_scoped"></div>
+            <div class="result-value" style="font-size: 32px;" id="cssADSValue">-</div>
+            <div class="result-label"><span data-i18n="result_edpi_scoped"></span> <span id="edpiADS">-</span></div>
+        </div>
+
+        <div class="footer" data-i18n="formula"></div>
+    </div>
+
+    <script>
+        const translations = {
+            en: {
+                title: "🎯 Sensitivity Converter",
+                subtitle: "Aim Lab → Counter-Strike Source",
+                info: "💡 <strong>Info:</strong> Enter your current Aim Lab settings to get the equivalent sensitivity in CS:S. Your values are automatically saved.",
+                label_aimlab_sens: "Aim Lab Sensitivity (hip fire)",
+                label_zoom_sens: "Aim Lab Zoom Sensitivity",
+                label_dpi: "Your DPI",
+                button_calculate: "Calculate CS:S Sensitivity",
+                result_css_normal: "CS:S Sensitivity (hip fire)",
+                result_css_scoped: "CS:S Sensitivity (scoped)",
+                result_edpi_scoped: "Scoped eDPI:",
+                formula: "Formula: eDPI = DPI × Sensitivity | CS:S sens = (Aim Lab sens × 12) / 10.16"
+            },
+            fr: {
+                title: "🎯 Convertisseur de Sensibilité",
+                subtitle: "Aim Lab → Counter-Strike Source",
+                info: "💡 <strong>Info:</strong> Entrez vos paramètres Aim Lab actuels pour obtenir la sensibilité équivalente dans CS:S. Vos valeurs sont sauvegardées automatiquement.",
+                label_aimlab_sens: "Sensibilité Aim Lab (sans viser)",
+                label_zoom_sens: "Sensibilité Zoom Aim Lab",
+                label_dpi: "Votre DPI",
+                button_calculate: "Calculer la sensibilité CS:S",
+                result_css_normal: "Sensibilité CS:S (sans viser)",
+                result_css_scoped: "Sensibilité CS:S (en visée)",
+                result_edpi_scoped: "eDPI visée:",
+                formula: "Formule: eDPI = DPI × Sensibilité | CS:S sens = (Aim Lab sens × 12) / 10.16"
+            },
+            es: {
+                title: "🎯 Convertidor de Sensibilidad",
+                subtitle: "Aim Lab → Counter-Strike Source",
+                info: "💡 <strong>Info:</strong> Ingresa tu configuración actual de Aim Lab para obtener la sensibilidad equivalente en CS:S. Tus valores se guardan automáticamente.",
+                label_aimlab_sens: "Sensibilidad Aim Lab (sin apuntar)",
+                label_zoom_sens: "Sensibilidad Zoom Aim Lab",
+                label_dpi: "Tu DPI",
+                button_calculate: "Calcular sensibilidad CS:S",
+                result_css_normal: "Sensibilidad CS:S (sin apuntar)",
+                result_css_scoped: "Sensibilidad CS:S (apuntando)",
+                result_edpi_scoped: "eDPI mira:",
+                formula: "Fórmula: eDPI = DPI × Sensibilidad | CS:S sens = (Aim Lab sens × 12) / 10.16"
+            },
+            de: {
+                title: "🎯 Empfindlichkeitskonverter",
+                subtitle: "Aim Lab → Counter-Strike Source",
+                info: "💡 <strong>Info:</strong> Geben Sie Ihre aktuellen Aim Lab-Einstellungen ein, um die entsprechende Empfindlichkeit in CS:S zu erhalten. Ihre Werte werden automatisch gespeichert.",
+                label_aimlab_sens: "Aim Lab Empfindlichkeit (Hüftfeuer)",
+                label_zoom_sens: "Aim Lab Zoom-Empfindlichkeit",
+                label_dpi: "Ihre DPI",
+                button_calculate: "CS:S Empfindlichkeit berechnen",
+                result_css_normal: "CS:S Empfindlichkeit (Hüftfeuer)",
+                result_css_scoped: "CS:S Empfindlichkeit (Zielen)",
+                result_edpi_scoped: "Ziel-eDPI:",
+                formula: "Formel: eDPI = DPI × Empfindlichkeit | CS:S sens = (Aim Lab sens × 12) / 10.16"
+            },
+            pt: {
+                title: "🎯 Conversor de Sensibilidade",
+                subtitle: "Aim Lab → Counter-Strike Source",
+                info: "💡 <strong>Info:</strong> Digite suas configurações atuais do Aim Lab para obter a sensibilidade equivalente no CS:S. Seus valores são salvos automaticamente.",
+                label_aimlab_sens: "Sensibilidade Aim Lab (sem mirar)",
+                label_zoom_sens: "Sensibilidade Zoom Aim Lab",
+                label_dpi: "Seu DPI",
+                button_calculate: "Calcular sensibilidade CS:S",
+                result_css_normal: "Sensibilidade CS:S (sem mirar)",
+                result_css_scoped: "Sensibilidade CS:S (mirando)",
+                result_edpi_scoped: "eDPI mira:",
+                formula: "Fórmula: eDPI = DPI × Sensibilidade | CS:S sens = (Aim Lab sens × 12) / 10.16"
+            },
+            ru: {
+                title: "🎯 Конвертер Чувствительности",
+                subtitle: "Aim Lab → Counter-Strike Source",
+                info: "💡 <strong>Инфо:</strong> Введите текущие настройки Aim Lab, чтобы получить эквивалентную чувствительность в CS:S. Ваши значения сохраняются автоматически.",
+                label_aimlab_sens: "Чувствительность Aim Lab (без прицела)",
+                label_zoom_sens: "Чувствительность прицела Aim Lab",
+                label_dpi: "Ваш DPI",
+                button_calculate: "Рассчитать чувствительность CS:S",
+                result_css_normal: "Чувствительность CS:S (без прицела)",
+                result_css_scoped: "Чувствительность CS:S (с прицелом)",
+                result_edpi_scoped: "eDPI прицела:",
+                formula: "Формула: eDPI = DPI × Чувствительность | CS:S sens = (Aim Lab sens × 12) / 10.16"
+            },
+            ja: {
+                title: "🎯 感度コンバーター",
+                subtitle: "Aim Lab → Counter-Strike Source",
+                info: "💡 <strong>情報:</strong> 現在のAim Lab設定を入力すると、CS:Sの同等の感度が得られます。値は自動的に保存されます。",
+                label_aimlab_sens: "Aim Lab感度（腰撃ち）",
+                label_zoom_sens: "Aim Labズーム感度",
+                label_dpi: "あなたのDPI",
+                button_calculate: "CS:S感度を計算",
+                result_css_normal: "CS:S感度（腰撃ち）",
+                result_css_scoped: "CS:S感度（スコープ）",
+                result_edpi_scoped: "スコープeDPI:",
+                formula: "計算式: eDPI = DPI × 感度 | CS:S sens = (Aim Lab sens × 12) / 10.16"
+            }
+        };
+
+        function changeLanguage() {
+            const lang = document.getElementById('languageSelect').value;
+            localStorage.setItem('language', lang);
+            applyTranslations(lang);
+        }
+
+        function applyTranslations(lang) {
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    element.innerHTML = translations[lang][key];
+                }
+            });
+        }
+
+        // Charger les valeurs sauvegardées au démarrage
+        function loadSavedValues() {
+            const savedAimlabSens = localStorage.getItem('aimlabSens');
+            const savedAimlabADS = localStorage.getItem('aimlabADS');
+            const savedDPI = localStorage.getItem('dpi');
+            const savedLanguage = localStorage.getItem('language') || 'en';
+
+            if (savedAimlabSens) document.getElementById('aimlabSens').value = savedAimlabSens;
+            if (savedAimlabADS) document.getElementById('aimlabADS').value = savedAimlabADS;
+            if (savedDPI) document.getElementById('dpi').value = savedDPI;
+            
+            document.getElementById('languageSelect').value = savedLanguage;
+            applyTranslations(savedLanguage);
+        }
+
+        function convertSensitivity() {
+            // Récupérer les valeurs
+            const aimlabSens = parseFloat(document.getElementById('aimlabSens').value);
+            const aimlabADS = parseFloat(document.getElementById('aimlabADS').value);
+            const dpi = parseFloat(document.getElementById('dpi').value);
+
+            // Sauvegarder les valeurs
+            localStorage.setItem('aimlabSens', aimlabSens);
+            localStorage.setItem('aimlabADS', aimlabADS);
+            localStorage.setItem('dpi', dpi);
+
+            // Formule de conversion Aim Lab → CS:S
+            // CS:S sens = (Aim Lab sens × 12) / 10.16
+            
+            const cssSensitivity = (aimlabSens * 12) / 10.16;
+            const cssADSSensitivity = (aimlabADS * 12) / 10.16;
+            
+            // Calcul de l'eDPI (effective DPI)
+            const edpi = dpi * cssSensitivity;
+            const edpiADS = dpi * cssADSSensitivity;
+
+            // Affichage des résultats
+            document.getElementById('cssValue').textContent = cssSensitivity.toFixed(3);
+            document.getElementById('edpi').textContent = edpi.toFixed(0);
+            document.getElementById('cssADSValue').textContent = cssADSSensitivity.toFixed(3);
+            document.getElementById('edpiADS').textContent = edpiADS.toFixed(0);
+            
+            const resultBox = document.getElementById('result');
+            resultBox.classList.add('show');
+        }
+
+        // Calculer automatiquement quand on change les valeurs
+        document.getElementById('aimlabSens').addEventListener('input', convertSensitivity);
+        document.getElementById('aimlabADS').addEventListener('input', convertSensitivity);
+        document.getElementById('dpi').addEventListener('input', convertSensitivity);
+
+        // Calculer au chargement
+        window.onload = function() {
+            loadSavedValues();
+            convertSensitivity();
+        };
+    </script>
+</body>
+</html>
