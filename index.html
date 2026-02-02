@@ -25,7 +25,7 @@
             background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
             padding: 40px;
-            max-width: 600px;
+            max-width: 700px;
             width: 100%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             position: relative;
@@ -77,6 +77,56 @@
             font-size: 14px;
         }
 
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: #666;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .tab:hover {
+            color: #00BCD4;
+        }
+
+        .tab.active {
+            color: #00BCD4;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #00BCD4;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         .input-group {
             margin-bottom: 25px;
         }
@@ -89,7 +139,7 @@
             font-size: 14px;
         }
 
-        input[type="number"] {
+        input[type="number"], input[type="text"] {
             width: 100%;
             padding: 12px 15px;
             border: 2px solid #ddd;
@@ -98,7 +148,7 @@
             transition: border-color 0.3s;
         }
 
-        input[type="number"]:focus {
+        input[type="number"]:focus, input[type="text"]:focus {
             outline: none;
             border-color: #00BCD4;
         }
@@ -172,11 +222,105 @@
             transform: translateY(0);
         }
 
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        .history-item:hover {
+            background: #e8f5e9;
+        }
+
+        .history-info {
+            flex: 1;
+        }
+
+        .history-date {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        .history-values {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .history-values strong {
+            color: #00BCD4;
+        }
+
+        .history-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 13px;
+            width: auto;
+            background: #00BCD4;
+        }
+
+        .btn-delete {
+            background: #f44336;
+        }
+
+        .btn-delete:hover {
+            box-shadow: 0 3px 10px rgba(244, 67, 54, 0.4);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .add-history-form {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
         .footer {
             text-align: center;
             margin-top: 20px;
             color: #999;
             font-size: 12px;
+        }
+
+        .premium-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #000;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 8px;
         }
     </style>
 </head>
@@ -197,40 +341,83 @@
         <h1 data-i18n="title">🎯 Sensitivity Converter</h1>
         <p class="subtitle" data-i18n="subtitle">Aim Lab → Counter-Strike Source</p>
 
-        <div class="info-box">
-            <span data-i18n="info"></span>
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('converter')" data-i18n="tab_converter">Converter</button>
+            <button class="tab" onclick="switchTab('history')" data-i18n="tab_history">History</button>
         </div>
 
-        <div class="input-group">
-            <label for="aimlabSens" data-i18n="label_aimlab_sens"></label>
-            <input type="number" id="aimlabSens" value="1.19141" step="0.00001" min="0.1" max="10">
+        <!-- CONVERTER TAB -->
+        <div id="converter-tab" class="tab-content active">
+            <div class="info-box">
+                <span data-i18n="info"></span>
+            </div>
+
+            <div class="input-group">
+                <label for="aimlabSens" data-i18n="label_aimlab_sens"></label>
+                <input type="number" id="aimlabSens" value="1.19141" step="0.00001" min="0.1" max="10">
+            </div>
+
+            <div class="input-group">
+                <label for="aimlabADS" data-i18n="label_zoom_sens"></label>
+                <input type="number" id="aimlabADS" value="0.8189" step="0.00001" min="0.1" max="10">
+            </div>
+
+            <div class="input-group">
+                <label for="dpi" data-i18n="label_dpi"></label>
+                <input type="number" id="dpi" value="1800" min="100" max="20000">
+            </div>
+
+            <button onclick="convertSensitivity()" data-i18n="button_calculate"></button>
+
+            <div id="result" class="result-box">
+                <div class="result-label" data-i18n="result_css_normal"></div>
+                <div class="result-value" id="cssValue">-</div>
+                <div class="result-label">eDPI: <span id="edpi">-</span></div>
+                
+                <hr style="margin: 20px 0; opacity: 0.3;">
+                
+                <div class="result-label" data-i18n="result_css_scoped"></div>
+                <div class="result-value" style="font-size: 32px;" id="cssADSValue">-</div>
+                <div class="result-label"><span data-i18n="result_edpi_scoped"></span> <span id="edpiADS">-</span></div>
+            </div>
+
+            <div class="footer" data-i18n="formula"></div>
         </div>
 
-        <div class="input-group">
-            <label for="aimlabADS" data-i18n="label_zoom_sens"></label>
-            <input type="number" id="aimlabADS" value="0.8189" step="0.00001" min="0.1" max="10">
+        <!-- HISTORY TAB -->
+        <div id="history-tab" class="tab-content">
+            <div class="info-box">
+                <span data-i18n="history_info"></span>
+                <span class="premium-badge">PREMIUM</span>
+            </div>
+
+            <div class="add-history-form">
+                <h3 style="margin-bottom: 15px; color: #333;" data-i18n="add_entry_title">Add New Entry</h3>
+                <div class="form-row">
+                    <div class="input-group" style="margin-bottom: 15px;">
+                        <label for="historyNote" data-i18n="label_note"></label>
+                        <input type="text" id="historyNote" placeholder="e.g., Aim Lab recommendation">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 15px;">
+                        <label for="historyDpi" data-i18n="label_dpi"></label>
+                        <input type="number" id="historyDpi" value="1800" min="100" max="20000">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group" style="margin-bottom: 15px;">
+                        <label for="historySens" data-i18n="label_aimlab_sens"></label>
+                        <input type="number" id="historySens" step="0.00001" min="0.1" max="10">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 15px;">
+                        <label for="historyADS" data-i18n="label_zoom_sens"></label>
+                        <input type="number" id="historyADS" step="0.00001" min="0.1" max="10">
+                    </div>
+                </div>
+                <button onclick="addHistoryEntry()" data-i18n="button_add">Add to History</button>
+            </div>
+
+            <div id="historyList" class="history-list"></div>
         </div>
-
-        <div class="input-group">
-            <label for="dpi" data-i18n="label_dpi"></label>
-            <input type="number" id="dpi" value="1800" min="100" max="20000">
-        </div>
-
-        <button onclick="convertSensitivity()" data-i18n="button_calculate"></button>
-
-        <div id="result" class="result-box">
-            <div class="result-label" data-i18n="result_css_normal"></div>
-            <div class="result-value" id="cssValue">-</div>
-            <div class="result-label">eDPI: <span id="edpi">-</span></div>
-            
-            <hr style="margin: 20px 0; opacity: 0.3;">
-            
-            <div class="result-label" data-i18n="result_css_scoped"></div>
-            <div class="result-value" style="font-size: 32px;" id="cssADSValue">-</div>
-            <div class="result-label"><span data-i18n="result_edpi_scoped"></span> <span id="edpiADS">-</span></div>
-        </div>
-
-        <div class="footer" data-i18n="formula"></div>
     </div>
 
     <script>
@@ -238,98 +425,189 @@
             en: {
                 title: "🎯 Sensitivity Converter",
                 subtitle: "Aim Lab → Counter-Strike Source",
+                tab_converter: "Converter",
+                tab_history: "History",
                 info: "💡 <strong>Info:</strong> Enter your current Aim Lab settings to get the equivalent sensitivity in CS:S. Your values are automatically saved.",
+                history_info: "📊 <strong>Track your sensitivity:</strong> The Sensitivity Finder in Aim Lab Premium regularly suggests new sensitivities. Save them here to track your evolution and compare conversions!",
                 label_aimlab_sens: "Aim Lab Sensitivity (hip fire)",
                 label_zoom_sens: "Aim Lab Zoom Sensitivity",
                 label_dpi: "Your DPI",
+                label_note: "Note (optional)",
                 button_calculate: "Calculate CS:S Sensitivity",
+                button_add: "Add to History",
+                add_entry_title: "Add New Entry",
                 result_css_normal: "CS:S Sensitivity (hip fire)",
                 result_css_scoped: "CS:S Sensitivity (scoped)",
                 result_edpi_scoped: "Scoped eDPI:",
-                formula: "Formula: eDPI = DPI × Sensitivity | CS:S sens = (Aim Lab sens × 12) / 10.16"
+                formula: "Formula: eDPI = DPI × Sensitivity | CS:S sens = (Aim Lab sens × 12) / 10.16",
+                empty_history: "No saved sensitivities yet",
+                empty_history_sub: "Add your Aim Lab recommendations to track your progress!",
+                btn_apply: "Apply",
+                btn_delete: "Delete"
             },
             fr: {
                 title: "🎯 Convertisseur de Sensibilité",
                 subtitle: "Aim Lab → Counter-Strike Source",
+                tab_converter: "Convertisseur",
+                tab_history: "Historique",
                 info: "💡 <strong>Info:</strong> Entrez vos paramètres Aim Lab actuels pour obtenir la sensibilité équivalente dans CS:S. Vos valeurs sont sauvegardées automatiquement.",
+                history_info: "📊 <strong>Suivez votre sensibilité:</strong> Le Sensitivity Finder d'Aim Lab Premium propose régulièrement de nouvelles sensibilités. Sauvegardez-les ici pour suivre votre évolution et comparer les conversions !",
                 label_aimlab_sens: "Sensibilité Aim Lab (sans viser)",
                 label_zoom_sens: "Sensibilité Zoom Aim Lab",
                 label_dpi: "Votre DPI",
+                label_note: "Note (optionnel)",
                 button_calculate: "Calculer la sensibilité CS:S",
+                button_add: "Ajouter à l'historique",
+                add_entry_title: "Ajouter une entrée",
                 result_css_normal: "Sensibilité CS:S (sans viser)",
                 result_css_scoped: "Sensibilité CS:S (en visée)",
                 result_edpi_scoped: "eDPI visée:",
-                formula: "Formule: eDPI = DPI × Sensibilité | CS:S sens = (Aim Lab sens × 12) / 10.16"
+                formula: "Formule: eDPI = DPI × Sensibilité | CS:S sens = (Aim Lab sens × 12) / 10.16",
+                empty_history: "Aucune sensibilité enregistrée",
+                empty_history_sub: "Ajoutez vos recommandations Aim Lab pour suivre votre progression !",
+                btn_apply: "Appliquer",
+                btn_delete: "Supprimer"
             },
             es: {
                 title: "🎯 Convertidor de Sensibilidad",
                 subtitle: "Aim Lab → Counter-Strike Source",
+                tab_converter: "Convertidor",
+                tab_history: "Historial",
                 info: "💡 <strong>Info:</strong> Ingresa tu configuración actual de Aim Lab para obtener la sensibilidad equivalente en CS:S. Tus valores se guardan automáticamente.",
+                history_info: "📊 <strong>Rastrea tu sensibilidad:</strong> El Sensitivity Finder de Aim Lab Premium sugiere regularmente nuevas sensibilidades. ¡Guárdalas aquí para rastrear tu evolución y comparar conversiones!",
                 label_aimlab_sens: "Sensibilidad Aim Lab (sin apuntar)",
                 label_zoom_sens: "Sensibilidad Zoom Aim Lab",
                 label_dpi: "Tu DPI",
+                label_note: "Nota (opcional)",
                 button_calculate: "Calcular sensibilidad CS:S",
+                button_add: "Añadir al historial",
+                add_entry_title: "Añadir nueva entrada",
                 result_css_normal: "Sensibilidad CS:S (sin apuntar)",
                 result_css_scoped: "Sensibilidad CS:S (apuntando)",
                 result_edpi_scoped: "eDPI mira:",
-                formula: "Fórmula: eDPI = DPI × Sensibilidad | CS:S sens = (Aim Lab sens × 12) / 10.16"
+                formula: "Fórmula: eDPI = DPI × Sensibilidad | CS:S sens = (Aim Lab sens × 12) / 10.16",
+                empty_history: "No hay sensibilidades guardadas",
+                empty_history_sub: "¡Añade tus recomendaciones de Aim Lab para rastrear tu progreso!",
+                btn_apply: "Aplicar",
+                btn_delete: "Eliminar"
             },
             de: {
                 title: "🎯 Empfindlichkeitskonverter",
                 subtitle: "Aim Lab → Counter-Strike Source",
+                tab_converter: "Konverter",
+                tab_history: "Verlauf",
                 info: "💡 <strong>Info:</strong> Geben Sie Ihre aktuellen Aim Lab-Einstellungen ein, um die entsprechende Empfindlichkeit in CS:S zu erhalten. Ihre Werte werden automatisch gespeichert.",
+                history_info: "📊 <strong>Verfolgen Sie Ihre Empfindlichkeit:</strong> Der Sensitivity Finder in Aim Lab Premium schlägt regelmäßig neue Empfindlichkeiten vor. Speichern Sie sie hier, um Ihre Entwicklung zu verfolgen!",
                 label_aimlab_sens: "Aim Lab Empfindlichkeit (Hüftfeuer)",
                 label_zoom_sens: "Aim Lab Zoom-Empfindlichkeit",
                 label_dpi: "Ihre DPI",
+                label_note: "Notiz (optional)",
                 button_calculate: "CS:S Empfindlichkeit berechnen",
+                button_add: "Zum Verlauf hinzufügen",
+                add_entry_title: "Neuen Eintrag hinzufügen",
                 result_css_normal: "CS:S Empfindlichkeit (Hüftfeuer)",
                 result_css_scoped: "CS:S Empfindlichkeit (Zielen)",
                 result_edpi_scoped: "Ziel-eDPI:",
-                formula: "Formel: eDPI = DPI × Empfindlichkeit | CS:S sens = (Aim Lab sens × 12) / 10.16"
+                formula: "Formel: eDPI = DPI × Empfindlichkeit | CS:S sens = (Aim Lab sens × 12) / 10.16",
+                empty_history: "Keine gespeicherten Empfindlichkeiten",
+                empty_history_sub: "Fügen Sie Ihre Aim Lab-Empfehlungen hinzu!",
+                btn_apply: "Anwenden",
+                btn_delete: "Löschen"
             },
             pt: {
                 title: "🎯 Conversor de Sensibilidade",
                 subtitle: "Aim Lab → Counter-Strike Source",
+                tab_converter: "Conversor",
+                tab_history: "Histórico",
                 info: "💡 <strong>Info:</strong> Digite suas configurações atuais do Aim Lab para obter a sensibilidade equivalente no CS:S. Seus valores são salvos automaticamente.",
+                history_info: "📊 <strong>Acompanhe sua sensibilidade:</strong> O Sensitivity Finder do Aim Lab Premium sugere regularmente novas sensibilidades. Salve-as aqui para acompanhar sua evolução!",
                 label_aimlab_sens: "Sensibilidade Aim Lab (sem mirar)",
                 label_zoom_sens: "Sensibilidade Zoom Aim Lab",
                 label_dpi: "Seu DPI",
+                label_note: "Nota (opcional)",
                 button_calculate: "Calcular sensibilidade CS:S",
+                button_add: "Adicionar ao histórico",
+                add_entry_title: "Adicionar nova entrada",
                 result_css_normal: "Sensibilidade CS:S (sem mirar)",
                 result_css_scoped: "Sensibilidade CS:S (mirando)",
                 result_edpi_scoped: "eDPI mira:",
-                formula: "Fórmula: eDPI = DPI × Sensibilidade | CS:S sens = (Aim Lab sens × 12) / 10.16"
+                formula: "Fórmula: eDPI = DPI × Sensibilidade | CS:S sens = (Aim Lab sens × 12) / 10.16",
+                empty_history: "Nenhuma sensibilidade salva",
+                empty_history_sub: "Adicione suas recomendações do Aim Lab!",
+                btn_apply: "Aplicar",
+                btn_delete: "Excluir"
             },
             ru: {
                 title: "🎯 Конвертер Чувствительности",
                 subtitle: "Aim Lab → Counter-Strike Source",
+                tab_converter: "Конвертер",
+                tab_history: "История",
                 info: "💡 <strong>Инфо:</strong> Введите текущие настройки Aim Lab, чтобы получить эквивалентную чувствительность в CS:S. Ваши значения сохраняются автоматически.",
+                history_info: "📊 <strong>Отслеживайте чувствительность:</strong> Sensitivity Finder в Aim Lab Premium регулярно предлагает новые значения. Сохраните их здесь, чтобы отслеживать прогресс!",
                 label_aimlab_sens: "Чувствительность Aim Lab (без прицела)",
                 label_zoom_sens: "Чувствительность прицела Aim Lab",
                 label_dpi: "Ваш DPI",
+                label_note: "Заметка (необязательно)",
                 button_calculate: "Рассчитать чувствительность CS:S",
+                button_add: "Добавить в историю",
+                add_entry_title: "Добавить новую запись",
                 result_css_normal: "Чувствительность CS:S (без прицела)",
                 result_css_scoped: "Чувствительность CS:S (с прицелом)",
                 result_edpi_scoped: "eDPI прицела:",
-                formula: "Формула: eDPI = DPI × Чувствительность | CS:S sens = (Aim Lab sens × 12) / 10.16"
+                formula: "Формула: eDPI = DPI × Чувствительность | CS:S sens = (Aim Lab sens × 12) / 10.16",
+                empty_history: "Нет сохраненных настроек",
+                empty_history_sub: "Добавьте рекомендации Aim Lab!",
+                btn_apply: "Применить",
+                btn_delete: "Удалить"
             },
             ja: {
                 title: "🎯 感度コンバーター",
                 subtitle: "Aim Lab → Counter-Strike Source",
+                tab_converter: "コンバーター",
+                tab_history: "履歴",
                 info: "💡 <strong>情報:</strong> 現在のAim Lab設定を入力すると、CS:Sの同等の感度が得られます。値は自動的に保存されます。",
+                history_info: "📊 <strong>感度を追跡:</strong> Aim Lab PremiumのSensitivity Finderは定期的に新しい感度を提案します。ここに保存して進化を追跡しましょう！",
                 label_aimlab_sens: "Aim Lab感度（腰撃ち）",
                 label_zoom_sens: "Aim Labズーム感度",
                 label_dpi: "あなたのDPI",
+                label_note: "メモ（オプション）",
                 button_calculate: "CS:S感度を計算",
+                button_add: "履歴に追加",
+                add_entry_title: "新しいエントリを追加",
                 result_css_normal: "CS:S感度（腰撃ち）",
                 result_css_scoped: "CS:S感度（スコープ）",
                 result_edpi_scoped: "スコープeDPI:",
-                formula: "計算式: eDPI = DPI × 感度 | CS:S sens = (Aim Lab sens × 12) / 10.16"
+                formula: "計算式: eDPI = DPI × 感度 | CS:S sens = (Aim Lab sens × 12) / 10.16",
+                empty_history: "保存された感度はありません",
+                empty_history_sub: "Aim Labの推奨を追加して進捗を追跡！",
+                btn_apply: "適用",
+                btn_delete: "削除"
             }
         };
 
+        let currentLang = 'en';
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName === 'history') {
+                displayHistory();
+            }
+        }
+
         function changeLanguage() {
             const lang = document.getElementById('languageSelect').value;
+            currentLang = lang;
             localStorage.setItem('language', lang);
             applyTranslations(lang);
         }
@@ -344,7 +622,6 @@
             });
         }
 
-        // Charger les valeurs sauvegardées au démarrage
         function loadSavedValues() {
             const savedAimlabSens = localStorage.getItem('aimlabSens');
             const savedAimlabADS = localStorage.getItem('aimlabADS');
@@ -353,34 +630,31 @@
 
             if (savedAimlabSens) document.getElementById('aimlabSens').value = savedAimlabSens;
             if (savedAimlabADS) document.getElementById('aimlabADS').value = savedAimlabADS;
-            if (savedDPI) document.getElementById('dpi').value = savedDPI;
+            if (savedDPI) {
+                document.getElementById('dpi').value = savedDPI;
+                document.getElementById('historyDpi').value = savedDPI;
+            }
             
+            currentLang = savedLanguage;
             document.getElementById('languageSelect').value = savedLanguage;
             applyTranslations(savedLanguage);
         }
 
         function convertSensitivity() {
-            // Récupérer les valeurs
             const aimlabSens = parseFloat(document.getElementById('aimlabSens').value);
             const aimlabADS = parseFloat(document.getElementById('aimlabADS').value);
             const dpi = parseFloat(document.getElementById('dpi').value);
 
-            // Sauvegarder les valeurs
             localStorage.setItem('aimlabSens', aimlabSens);
             localStorage.setItem('aimlabADS', aimlabADS);
             localStorage.setItem('dpi', dpi);
 
-            // Formule de conversion Aim Lab → CS:S
-            // CS:S sens = (Aim Lab sens × 12) / 10.16
-            
             const cssSensitivity = (aimlabSens * 12) / 10.16;
             const cssADSSensitivity = (aimlabADS * 12) / 10.16;
             
-            // Calcul de l'eDPI (effective DPI)
             const edpi = dpi * cssSensitivity;
             const edpiADS = dpi * cssADSSensitivity;
 
-            // Affichage des résultats
             document.getElementById('cssValue').textContent = cssSensitivity.toFixed(3);
             document.getElementById('edpi').textContent = edpi.toFixed(0);
             document.getElementById('cssADSValue').textContent = cssADSSensitivity.toFixed(3);
@@ -390,15 +664,112 @@
             resultBox.classList.add('show');
         }
 
-        // Calculer automatiquement quand on change les valeurs
+        function addHistoryEntry() {
+            const note = document.getElementById('historyNote').value || 'Aim Lab recommendation';
+            const sens = parseFloat(document.getElementById('historySens').value);
+            const ads = parseFloat(document.getElementById('historyADS').value);
+            const dpi = parseFloat(document.getElementById('historyDpi').value);
+
+            if (!sens || !ads || !dpi) {
+                alert('Please fill in all sensitivity values!');
+                return;
+            }
+
+            const entry = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                note: note,
+                sens: sens,
+                ads: ads,
+                dpi: dpi
+            };
+
+            let history = JSON.parse(localStorage.getItem('sensitivityHistory') || '[]');
+            history.unshift(entry);
+            localStorage.setItem('sensitivityHistory', JSON.stringify(history));
+
+            // Clear form
+            document.getElementById('historyNote').value = '';
+            document.getElementById('historySens').value = '';
+            document.getElementById('historyADS').value = '';
+
+            displayHistory();
+        }
+
+        function displayHistory() {
+            const history = JSON.parse(localStorage.getItem('sensitivityHistory') || '[]');
+            const historyList = document.getElementById('historyList');
+
+            if (history.length === 0) {
+                historyList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <div><strong>${translations[currentLang].empty_history}</strong></div>
+                        <div style="margin-top: 8px;">${translations[currentLang].empty_history_sub}</div>
+                    </div>
+                `;
+                return;
+            }
+
+            historyList.innerHTML = history.map(entry => {
+                const date = new Date(entry.date);
+                const dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+                const cssSens = ((entry.sens * 12) / 10.16).toFixed(3);
+                const cssADS = ((entry.ads * 12) / 10.16).toFixed(3);
+                
+                return `
+                    <div class="history-item">
+                        <div class="history-info">
+                            <div class="history-date">${dateStr}</div>
+                            <div class="history-values">
+                                <strong>${entry.note}</strong><br>
+                                Aim Lab: ${entry.sens} / ${entry.ads} | DPI: ${entry.dpi}<br>
+                                CS:S: <strong>${cssSens}</strong> / <strong>${cssADS}</strong>
+                            </div>
+                        </div>
+                        <div class="history-actions">
+                            <button class="btn-small" onclick="applyHistoryEntry(${entry.id})">${translations[currentLang].btn_apply}</button>
+                            <button class="btn-small btn-delete" onclick="deleteHistoryEntry(${entry.id})">${translations[currentLang].btn_delete}</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function applyHistoryEntry(id) {
+            const history = JSON.parse(localStorage.getItem('sensitivityHistory') || '[]');
+            const entry = history.find(e => e.id === id);
+            
+            if (entry) {
+                document.getElementById('aimlabSens').value = entry.sens;
+                document.getElementById('aimlabADS').value = entry.ads;
+                document.getElementById('dpi').value = entry.dpi;
+                
+                convertSensitivity();
+                switchTab('converter');
+                document.querySelector('.tab').click();
+            }
+        }
+
+        function deleteHistoryEntry(id) {
+            if (!confirm('Delete this entry?')) return;
+            
+            let history = JSON.parse(localStorage.getItem('sensitivityHistory') || '[]');
+            history = history.filter(e => e.id !== id);
+            localStorage.setItem('sensitivityHistory', JSON.stringify(history));
+            displayHistory();
+        }
+
+        // Auto-calculate on input change
         document.getElementById('aimlabSens').addEventListener('input', convertSensitivity);
         document.getElementById('aimlabADS').addEventListener('input', convertSensitivity);
         document.getElementById('dpi').addEventListener('input', convertSensitivity);
 
-        // Calculer au chargement
+        // Load on start
         window.onload = function() {
             loadSavedValues();
             convertSensitivity();
+            displayHistory();
         };
     </script>
 </body>
